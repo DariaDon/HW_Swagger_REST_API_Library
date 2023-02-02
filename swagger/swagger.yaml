@@ -1,0 +1,202 @@
+openapi: 3.0.0
+info:
+  title: OpenAPI спецификация каталога книг
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.0.3
+servers:
+- url: http://localhost:8080/api/v1/
+  description: Dev server
+paths:
+  /books:
+    get:
+      tags:
+      - Book
+      summary: Метод получения книг
+      description: Метод предназначен для получения списка всех книг
+      operationId: get_books
+      responses:
+        "200":
+          description: Список книг
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+                x-content-type: application/json;charset=UTF-8
+      x-openapi-router-controller: swagger_server.controllers.book_controller
+    post:
+      tags:
+      - Book
+      summary: Метод добавления новой книги в каталог
+      description: Метод предназначен для сохранения данных по новой книге.
+      operationId: create_book
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/Book'
+        required: true
+      responses:
+        "200":
+          description: Подтверждение успешного сохранения
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Book'
+        "400":
+          description: Некорректные входные данные. Возвращает список атрибутов с
+            ошибками
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                type: array
+                items:
+                  type: string
+                x-content-type: application/json;charset=UTF-8
+      x-openapi-router-controller: swagger_server.controllers.book_controller
+  /books/{id}:
+    get:
+      tags:
+      - Book
+      summary: Метод получения книги по идентификатору
+      operationId: get_book_by_id
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор книги
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        example: "1"
+      responses:
+        "200":
+          description: Книга
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Book'
+        default:
+          description: Любая неожиданная ошибка
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.book_controller
+    put:
+      tags:
+      - Book
+      summary: Метод обновления книги в каталоге
+      description: Метод предназначен для обновления данных по имеющейся книге.
+      operationId: update_book
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор книги
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        example: "1"
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/Book'
+        required: true
+      responses:
+        "200":
+          description: Подтверждение успешного обновления
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/Book'
+        "400":
+          description: Некорректные входные данные. Возвращает список атрибутов с
+            ошибками
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                x-content-type: application/json
+        default:
+          description: Любая неожиданная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-openapi-router-controller: swagger_server.controllers.book_controller
+    delete:
+      tags:
+      - Book
+      summary: Метод удаления книги по идентификатору
+      operationId: delete_book_by_id
+      parameters:
+      - name: id
+        in: path
+        description: Идентификатор книги
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        example: "1"
+      responses:
+        "200":
+          description: Успешное удаление
+          content: {}
+      x-openapi-router-controller: swagger_server.controllers.book_controller
+components:
+  schemas:
+    Book:
+      required:
+      - author
+      - genre
+      - title
+      - year
+      type: object
+      properties:
+        book_id:
+          type: string
+          example: "1"
+        title:
+          type: string
+          description: Название книги
+          example: Война и мир
+        author:
+          type: string
+          description: Автор книги
+          example: Лев Толстой
+        genre:
+          type: string
+          description: Жанр
+          example: Драма
+        year:
+          type: string
+          description: Год выпуска
+          example: "2021"
+      example:
+        year: "2021"
+        author: Лев Толстой
+        genre: Драма
+        book_id: "1"
+        title: Война и мир
+    Error:
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+
